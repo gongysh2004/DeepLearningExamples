@@ -44,5 +44,5 @@ ADD triton/requirements.txt /workspace/bert/triton/requirements.txt
 RUN pip install --upgrade --no-cache-dir pip
 RUN pip install --no-cache-dir -r /workspace/bert/requirements.txt
 RUN pip install --no-cache-dir -r /workspace/bert/triton/requirements.txt
-
+RUN pip install  --no-cache-dir "tritonclient==2.11.0" "numpy>1.21.4,<1.23.0"
 COPY . .

@@ -16,11 +16,10 @@ RUN apt-get update && apt-get install -y pbzip2 pv bzip2 cabextract
 
 ENV BERT_PREP_WORKING_DIR /workspace/bert/data
 
-WORKDIR /workspace
 
 WORKDIR /workspace/bert
 RUN pip install --no-cache-dir \
- tqdm boto3 requests six ipdb h5py nltk progressbar onnxruntime==1.12.0 tokenizers>=0.7\
+ tqdm boto3 requests six ipdb h5py nltk progressbar onnxruntime==1.12.0 tokenizers>=0.7 \
  git+https://github.com/NVIDIA/dllogger wget
 
 RUN apt-get install -y iputils-ping
@@ -33,3 +32,5 @@ RUN pip install git+https://github.com/NVIDIA/lddl.git
 RUN python -m nltk.downloader punkt
 
 RUN pip install lamb_amp_opt/
+# https://stackoverflow.com/questions/74981558/error-updating-python3-pip-attributeerror-module-lib-has-no-attribute-openss
+RUN pip install --no-cache-dir cryptography==38.0.4

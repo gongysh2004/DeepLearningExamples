@@ -6,6 +6,8 @@ The purpose of this document is to help you with achieving
 the best inference performance.
 
 ## Table of contents
+- [Deploying the BERT model on Triton Inference Server](#deploying-the-bert-model-on-triton-inference-server)
+  - [Table of contents](#table-of-contents)
   - [Solution overview](#solution-overview)
     - [Introduction](#introduction)
     - [Deployment process](#deployment-process)
@@ -13,27 +15,37 @@ the best inference performance.
   - [Quick Start Guide](#quick-start-guide)
   - [Performance](#performance)
     - [Offline scenario](#offline-scenario)
-        - [Offline: NVIDIA A30, ONNX Runtime with FP16](#offline-nvidia-a30-onnx-runtime-with-fp16)
-        - [Offline: NVIDIA A30, ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-a30-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
-        - [Offline: NVIDIA A30, NVIDIA TensorRT with FP16](#offline-nvidia-a30-nvidia-tensorrt-with-fp16)
-        - [Offline: NVIDIA A30, NVIDIA PyTorch with FP16](#offline-nvidia-a30-pytorch-with-fp16)
-        - [Offline: NVIDIA DGX-1 (1x V100 32GB), ONNX Runtime with FP16](#offline-nvidia-dgx-1-1x-v100-32gb-onnx-runtime-with-fp16)
-        - [Offline: NVIDIA DGX-1 (1x V100 32GB), ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-dgx-1-1x-v100-32gb-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
-        - [Offline: NVIDIA DGX-1 (1x V100 32GB), NVIDIA TensorRT with FP16](#offline-nvidia-dgx-1-1x-v100-32gb-nvidia-tensorrt-with-fp16)
-        - [Offline: NVIDIA DGX-1 (1x V100 32GB), PyTorch with FP16](#offline-nvidia-dgx-1-1x-v100-32gb-pytorch-with-fp16)
-        - [Offline: NVIDIA DGX A100 (1x A100 80GB), ONNX Runtime with FP16](#offline-nvidia-dgx-a100-1x-a100-80gb-onnx-runtime-with-fp16)
-        - [Offline: NVIDIA DGX A100 (1x A100 80GB), ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-dgx-a100-1x-a100-80gb-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
-        - [Offline: NVIDIA DGX A100 (1x A100 80GB), NVIDIA TensorRT with FP16](#offline-nvidia-dgx-a100-1x-a100-80gb-nvidia-tensorrt-with-fp16)
-        - [Offline: NVIDIA DGX A100 (1x A100 80GB), PyTorch with FP16](#offline-nvidia-dgx-a100-1x-a100-80gb-pytorch-with-fp16)
-        - [Offline: NVIDIA T4, ONNX Runtime with FP16](#offline-nvidia-t4-onnx-runtime-with-fp16)
-        - [Offline: NVIDIA T4, ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-t4-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
-        - [Offline: NVIDIA T4, NVIDIA TensorRT with FP16](#offline-nvidia-t4-nvidia-tensorrt-with-fp16)
-        - [Offline: NVIDIA T4, PyTorch with FP16](#offline-nvidia-t4-pytorch-with-fp16)
+      - [Offline: NVIDIA A30, ONNX Runtime with FP16](#offline-nvidia-a30-onnx-runtime-with-fp16)
+      - [Offline: NVIDIA A30, ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-a30-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
+      - [Offline: NVIDIA A30, NVIDIA TensorRT with FP16](#offline-nvidia-a30-nvidia-tensorrt-with-fp16)
+      - [Offline: NVIDIA A30, PyTorch with FP16](#offline-nvidia-a30-pytorch-with-fp16)
+      - [Offline: NVIDIA DGX-1 (1x V100 32GB), ONNX Runtime with FP16](#offline-nvidia-dgx-1-1x-v100-32gb-onnx-runtime-with-fp16)
+      - [Offline: NVIDIA DGX-1 (1x V100 32GB), ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-dgx-1-1x-v100-32gb-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
+      - [Offline: NVIDIA DGX-1 (1x V100 32GB), NVIDIA TensorRT with FP16](#offline-nvidia-dgx-1-1x-v100-32gb-nvidia-tensorrt-with-fp16)
+      - [Offline: NVIDIA DGX-1 (1x V100 32GB), PyTorch with FP16](#offline-nvidia-dgx-1-1x-v100-32gb-pytorch-with-fp16)
+      - [Offline: NVIDIA DGX A100 (1x A100 80GB), ONNX Runtime with FP16](#offline-nvidia-dgx-a100-1x-a100-80gb-onnx-runtime-with-fp16)
+      - [Offline: NVIDIA DGX A100 (1x A100 80GB), ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-dgx-a100-1x-a100-80gb-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
+      - [Offline: NVIDIA DGX A100 (1x A100 80GB), NVIDIA TensorRT with FP16](#offline-nvidia-dgx-a100-1x-a100-80gb-nvidia-tensorrt-with-fp16)
+      - [Offline: NVIDIA DGX A100 (1x A100 80GB), PyTorch with FP16](#offline-nvidia-dgx-a100-1x-a100-80gb-pytorch-with-fp16)
+      - [Offline: NVIDIA T4, ONNX Runtime with FP16](#offline-nvidia-t4-onnx-runtime-with-fp16)
+      - [Offline: NVIDIA T4, ONNX Runtime with FP16, Backend accelerator TensorRT](#offline-nvidia-t4-onnx-runtime-with-fp16-backend-accelerator-tensorrt)
+      - [Offline: NVIDIA T4, NVIDIA TensorRT with FP16](#offline-nvidia-t4-nvidia-tensorrt-with-fp16)
+      - [Offline: NVIDIA T4, PyTorch with FP16](#offline-nvidia-t4-pytorch-with-fp16)
   - [Advanced](#advanced)
     - [Prepare configuration](#prepare-configuration)
     - [Step by step deployment process](#step-by-step-deployment-process)
+      - [Clone Repository](#clone-repository)
+      - [Setup Environment](#setup-environment)
+      - [Setup Container](#setup-container)
+      - [Setup Parameters and Environment](#setup-parameters-and-environment)
+      - [Prepare Dataset and Checkpoint](#prepare-dataset-and-checkpoint)
+      - [Export Model](#export-model)
+      - [Convert Model](#convert-model)
+      - [Deploy Model](#deploy-model)
+      - [Prepare Triton Profiling Data](#prepare-triton-profiling-data)
+      - [Triton Performance Offline Test](#triton-performance-offline-test)
     - [Latency explanation](#latency-explanation)
-  - [Release notes](#release-notes)
+  - [Release Notes](#release-notes)
     - [Changelog](#changelog)
     - [Known issues](#known-issues)
 
@@ -131,7 +143,7 @@ NVIDIA DGX-1 (1x V100 32GB): ./triton/large/runner/start_NVIDIA-DGX-1-\(1x-V100-
 
 NVIDIA DGX A100 (1x A100 80GB): ./triton/large/runner/start_NVIDIA-DGX-A100-\(1x-A100-80GB\).sh
 
-NVIDIA T4: ./triton/large/runner/start_NVIDIA-T4.sh
+NVIDIA T4: [./triton/large/runner/start_NVIDIA-T4.sh](https://api.ngc.nvidia.com/v2/models/nvidia/bert_pyt_ckpt_large_qa_squad11_amp/versions/19.09.0/zip)
 ```
 
 ## Performance
@@ -709,7 +721,7 @@ python3 triton/export_model.py \
     ${FLAG} \
     \
     --config-file bert_configs/large.json \
-    --checkpoint ${CHECKPOINT_DIR}/bert_large_qa.pt \
+    --checkpoint ${CHECKPOINT_DIR}/large-qa/bert_large_qa.pt \
     --precision ${EXPORT_PRECISION} \
     \
     --vocab-file ${DATASETS_DIR}/data/google_pretrained_weights/uncased_L-24_H-1024_A-16/vocab.txt \
